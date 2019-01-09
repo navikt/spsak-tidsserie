@@ -1,4 +1,19 @@
 language: java
-script: mvn package
+script:
+- mvn package
+- |
+  if [ "$TRAVIS_BRANCH" = 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
+    gpg --fast-import travis/codesigning.asc
+    mvn --settings travis/settings.xml deploy -Prelease -DskipTests=true
+  fi
 jdk:
 - openjdk11
+env:
+  global:
+  - OSSRH_JIRA_USERNAME=navikt
+  - GPG_KEY_NAME=navikt
+  - secure: yn8CQ7gNmrprkILIgEEJp7GtPCy37y7yEiX+rH5ZnC+hda9FB1lHSSYx+HQNf5bWxmRHkt6NGnt/rfReGL/AW/bdlftVy+2KJNAU43O88t0kjiK0Gd3VHUTDLq4bIZPgLMtD9tsJ95OArW3DbptDm4XRbolF5/bHodlca1aroYIElSyArLRmVxQPZyV6iziSKUm7bqzJqiRYW1dLm0n/XF+RTfchh0S55tf4OZ2bLidvI5zkeHGq8Nuk7qZldBHSdU+KJRCEXryUntmix5at5DzpcLTuPgtUNypVd26uhps9CN8Fwer5WsAFBSB3+RNCYDeYnvkpZVTlM6IEZC1J+SJ2TMmx6AhwV+b9XwpAzxWbtgk0A/JYtRYyVsnt3w9OHPVaL6qopqDxJhyNioabtwZIh18hEnsxLTH/fsSax1HrzgZvbcvpcUyo88hgQpEMyQJgTOsTh8DlHWF6xG/0OrCs/ZxAHCJR1ISefuFezpGauBHB25UYq2JGsL6nUBl/GDR3LKU8QkUimu8qbqsS41gAbQCzkaQqr00enah4CYWWpzT+mpp9MiC/dQWQ1fwJ4V2C0XgIAyDQw8WiPmZ8xYt/oaH/p8baZc60dj33JUKsukVUTLVvpUpk3rWo71h47hDY8rGr9QTp2hoJHegGBpNPLtv/5FMcKA+vKlC1CzQ=
+  - secure: QLVsH0Sl31Ffx3xQaphz0jxY3bf/Dii+TPsQbha1oWp5AEEfpv7ANi9X8uGzRjwoEY1KsS7MLuP91Jmj+dwcyyX/BiQdvLeZUT0BNDP7BMroNeP4x9lJGSSmgpEqU3E4u1fUxambNRvpUKhBPSTb2to290Z5UypYoP89lbnecQPRx+NAXJM6Czf4DrilKh2nBr9FR5VPUhrIb+RJHnohTdShG/g9nALCg2KnUOzLllU+vwkHw7kC1lhToxPvZY6Ua0Eld61nMcMN7cN4YVURDhtCM1fnuFpGJQt5PpCqxpvbOYRo/ajsysBEWN8AWmrYChlu/o+scvlD9RBWE37kuPVc3fH8hSxR4CvPXZ2dcYCgPGxczq8kuQdiWYIYg9p9YYNDVzt2FBTp3D+dRO2GkIJO9NC/HlWslGfHDIewdcPPkB9HaF7UnVooyuOOwORMFSYYNIHN6m+LBR4+o61OAArkZQcyCezTG6VROXjS/aCe2N7AjVuXhDQXyMZr/v3gmgJn7w9hX19k5wZ9pj4PiPBxLXTjm2+6ig6qj50dOeR8he/AQYcrXQacSUcsaedd1OOdS1eaaKw+vq/ggborMC6tsZjCx1NPl1125olCanBgNNFadXWpC3c2BB7uY4MDtbxZosV9/1cu3iPExq8naWzm5SUC+9ajKp48NStx1yI=
+before_install:
+- openssl aes-256-cbc -K $encrypted_7c946dda8f99_key -iv $encrypted_7c946dda8f99_iv
+  -in travis/codesigning.asc.enc -out travis/codesigning.asc -d
